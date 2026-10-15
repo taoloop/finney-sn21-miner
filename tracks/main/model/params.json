@@ -1,0 +1,102 @@
+{
+ "budget_elasticity": {
+  "14": {
+   "conversions_delta_pct": 0.0,
+   "cost_delta_pct": 0.5,
+   "efficiency_delta_pct": 0.0
+  },
+  "28": {
+   "conversions_delta_pct": 0.0,
+   "cost_delta_pct": 0.5,
+   "efficiency_delta_pct": 0.0
+  },
+  "7": {
+   "conversions_delta_pct": 0.0,
+   "cost_delta_pct": 0.5,
+   "efficiency_delta_pct": 0.0
+  }
+ },
+ "fallback": {
+  "conversions_delta_pct": {
+   "p10": -0.356,
+   "p50": 0.008,
+   "p90": 0.372
+  },
+  "cost_delta_pct": {
+   "p10": -0.2824,
+   "p50": 0.012,
+   "p90": 0.3064
+  },
+  "efficiency_delta_pct": {
+   "p10": -0.318,
+   "p50": -0.006,
+   "p90": 0.306
+  }
+ },
+ "lean_cap": 2.0,
+ "quantiles": {
+  "14": {
+   "global": {
+    "conversions_delta_pct": {
+     "p10": -0.356,
+     "p50": 0.008,
+     "p90": 0.372
+    },
+    "cost_delta_pct": {
+     "p10": -0.2824,
+     "p50": 0.012,
+     "p90": 0.3064
+    },
+    "efficiency_delta_pct": {
+     "p10": -0.318,
+     "p50": -0.006,
+     "p90": 0.306
+    }
+   }
+  },
+  "28": {
+   "global": {
+    "conversions_delta_pct": {
+     "p10": -0.356,
+     "p50": 0.008,
+     "p90": 0.372
+    },
+    "cost_delta_pct": {
+     "p10": -0.2824,
+     "p50": 0.012,
+     "p90": 0.3064
+    },
+    "efficiency_delta_pct": {
+     "p10": -0.318,
+     "p50": -0.006,
+     "p90": 0.306
+    }
+   }
+  },
+  "7": {
+   "global": {
+    "conversions_delta_pct": {
+     "p10": -0.356,
+     "p50": 0.008,
+     "p90": 0.372
+    },
+    "cost_delta_pct": {
+     "p10": -0.2824,
+     "p50": 0.012,
+     "p90": 0.3064
+    },
+    "efficiency_delta_pct": {
+     "p10": -0.318,
+     "p50": -0.006,
+     "p90": 0.306
+    }
+   }
+  }
+ },
+ "trained_on": {
+  "note": "untrained: upstream reference_model constants (W28-W30 spreads, 0.5 budget lean). Run train.py on training v4 before shipping.",
+  "records": 0
+ },
+ "version": 1,
+ "width_scale": 1.0
+}

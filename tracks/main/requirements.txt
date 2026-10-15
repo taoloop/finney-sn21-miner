@@ -1,0 +1,5 @@
+# The miner, trainer, evaluator and tests use the Python 3.12 standard library only.
+# The image pins its interpreter in Dockerfile (python:3.12.7-slim-bookworm).
+# Person-only delivery tools, installed outside this repository:
+#   bittensor-cli  (btcli: register, stake)
+#   bittensor      (Subtensor.commit for the image digest)

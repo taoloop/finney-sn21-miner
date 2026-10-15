@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "profile_id": "0739fee0-17e7-4da7-89f1-f38a00d8617f",
+  "profile_digest": "129ae5d2fd0658e3592e7321c13648167e88b1541f7cccc5dee519b3734a3945",
+  "tracks": [
+    "main"
+  ],
+  "settings": [
+    {
+      "name": "BT_WALLET_NAME",
+      "description": "Bittensor wallet (coldkey) name that owns the miner hotkey; read by the person-run register and commitment steps.",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "BT_WALLET_HOTKEY",
+      "description": "Hotkey name, registered on finney netuid 21, that commits the image digest.",
+      "type": "string",
+      "required": true,
+      "default": "default"
+    }
+  ],
+  "sources": [
+    {
+      "path": "LICENSE-SN21-adtao",
+      "repository": "https://github.com/ippcteam/SN21-adtao",
+      "commit": "d0fad2db190b8a67f4e7ef2698f4814e32d3f0ea",
+      "licence": "MIT"
+    },
+    {
+      "path": "tracks/main/vendor/gate.py",
+      "repository": "https://github.com/ippcteam/SN21-adtao",
+      "commit": "d0fad2db190b8a67f4e7ef2698f4814e32d3f0ea",
+      "licence": "MIT"
+    },
+    {
+      "path": "tracks/main/vendor/settle_v2.py",
+      "repository": "https://github.com/ippcteam/SN21-adtao",
+      "commit": "d0fad2db190b8a67f4e7ef2698f4814e32d3f0ea",
+      "licence": "MIT"
+    },
+    {
+      "path": "tracks/main/vendor/reference_model.py",
+      "repository": "https://github.com/ippcteam/SN21-adtao",
+      "commit": "d0fad2db190b8a67f4e7ef2698f4814e32d3f0ea",
+      "licence": "MIT"
+    },
+    {
+      "path": "tracks/main/data/fixture_weekly.jsonl",
+      "repository": "https://github.com/ippcteam/SN21-adtao",
+      "commit": "d0fad2db190b8a67f4e7ef2698f4814e32d3f0ea",
+      "licence": "MIT"
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "kind": "coding_submission",
+  "uses": [],
+  "build": null,
+  "check": "python3 -m unittest discover -s tracks/main/tests -t tracks/main",
+  "run": "python3 tracks/main/model/predict.py",
+  "evaluate": "python3 tracks/main/evaluate.py",
+  "direction": "maximize",
+  "candidate": [
+    "model/predict.py",
+    "model/params.json",
+    "train.py",
+    "corpus.py",
+    "Dockerfile"
+  ],
+  "delivery": [
+    {
+      "title": "Register the miner hotkey on SN21 (finney netuid 21)",
+      "primitive": "person",
+      "command": "btcli subnet register --netuid 21 --subtensor.network finney --wallet.name \"$BT_WALLET_NAME\" --wallet.hotkey \"$BT_WALLET_HOTKEY\"",
+      "values": [
+        "netuid 21",
+        "network finney"
+      ],
+      "note": "Burns TAO and needs the coldkey password. Upstream docs also ask for a one-time ed25519 binding (scripts/sn21_keys.py generate, then register) from an upstream clone; that binding is a separate signed commit. One seat per coldkey is paid."
+    },
+    {
+      "title": "Train on the newest published bundle and keep the evaluate result",
+      "primitive": "person",
+      "command": "python3 tracks/main/train.py --data \"$SN21_TRAINING_DATA\" --holdout 0.2 && python3 tracks/main/evaluate.py --data \"$SN21_TRAINING_DATA\" && python3 tracks/main/train.py --data \"$SN21_TRAINING_DATA\" --holdout 0",
+      "values": [
+        "https://github.com/ippcteam/SN21-adtao/releases/download/training-v4-2026-10/SN21_training_v4.jsonl.gz"
+      ],
+      "note": "Download the bundle yourself (61 MB, not committed). Ship only if evaluate reports deterministic true, coverage 1.0, gate_admitted_estimate true and score above reference_v2; the last command refits on all data for the image."
+    },
+    {
+      "title": "Build the image and push it to a PRIVATE registry repository",
+      "primitive": "image",
+      "command": "docker build -t \"$SN21_IMAGE_REPO:candidate\" tracks/main && docker push \"$SN21_IMAGE_REPO:candidate\" && docker inspect --format='{{index .RepoDigests 0}}' \"$SN21_IMAGE_REPO:candidate\"",
+      "values": [
+        "<repo>@sha256:<64hex>"
+      ],
+      "note": "Keep the repository private until the commitment lands: the digest is content-addressed, and the earliest on-chain commit of a digest is the one paid."
+    },
+    {
+      "title": "Run the image in the subnet's sandbox flags three times and compare outputs",
+      "primitive": "person",
+      "command": "for i in 1 2 3; do docker run --rm -i --network=none --memory=1g --memory-swap=1g --cpus=1 --pids-limit=256 --read-only --security-opt=no-new-privileges \"$SN21_IMAGE_REPO@sha256:<64hex>\" < basket.jsonl > run$i.jsonl; done; cmp run1.jsonl run2.jsonl && cmp run2.jsonl run3.jsonl && echo deterministic",
+      "values": [],
+      "note": "basket.jsonl: about 250 served episodes, e.g. the input field of held-out training v4 records. Must finish well under 15 CPU minutes and 1 GB."
+    },
+    {
+      "title": "Commit the image digest on chain",
+      "primitive": "commitment",
+      "command": "python3 -c \"import bittensor as bt,os; s=bt.Subtensor(network='finney'); w=bt.Wallet(name=os.environ['BT_WALLET_NAME'], hotkey=os.environ['BT_WALLET_HOTKEY']); print(s.commit(wallet=w, netuid=21, data='sn21-model:v1:<repo>@sha256:<64hex>'))\"",
+      "values": [
+        "sn21-model:v1:<repo>@sha256:<64hex>"
+      ],
+      "note": "Repo lowercase with no tag; whole string about 128 bytes at most. The commitment slot is last-write-wins. A new digest re-enters the admission gate and starts a previous-model discount on older entries. The call is the one upstream's quickstart documents; newer bittensor releases may expose it as set_commitment."
+    },
+    {
+      "title": "Make the image repository public and check an anonymous pull",
+      "primitive": "person",
+      "command": "docker logout && docker pull \"$SN21_IMAGE_REPO@sha256:<64hex>\"",
+      "values": [],
+      "note": "Only after the commitment is visible on chain. A private image fails intake and is retried; it is never admitted."
+    },
+    {
+      "title": "Hold the published alpha floor on the miner hotkey",
+      "primitive": "person",
+      "command": null,
+      "values": [
+        "1,000 SN21 alpha since 15 Sep 2026"
+      ],
+      "note": "From upstream docs/SN21_STAKING.md: a hotkey below the hold is not seated for pay that day. Staking spends funds and is a person's decision."
+    },
+    {
+      "title": "Watch the admission verdict, daily coverage and standing",
+      "primitive": "person",
+      "command": "python3 scripts/verify_day.py --url https://hope-bittensor-api.onrender.com --day <YYYY-MM-DD>",
+      "values": [
+        "https://adtao.io/sn21/",
+        "https://adtao.io/sn21/miner-status"
+      ],
+      "note": "Run verify_day.py from an upstream SN21-adtao clone. Gate verdicts are announced on Discord and adtao.io. Paid needs 250 evidence mass, 7 scored settle days and at least 75% daily coverage."
+    }
+  ],
+  "settings": [
+    {
+      "name": "SN21_IMAGE_REPO",
+      "description": "Lowercase registry repository for the miner image, without tag, e.g. ghcr.io/<you>/sn21-miner. Used by the image and commitment steps.",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "SN21_TRAINING_DATA",
+      "description": "Path to a labelled corpus (training v4 .jsonl or .jsonl.gz, or v2/v3 .jsonl) for train.py and evaluate.py; the bundled weekly-era fixture is used when unset.",
+      "type": "string",
+      "required": false
+    }
+  ]
+}
